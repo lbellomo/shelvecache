@@ -1,6 +1,8 @@
 # shelvecache
 A simple python function cache in a shelve. 
 
+At the moment it is a toy project, for real applications use [joblib.Memory](https://joblib.readthedocs.io/en/latest/generated/joblib.Memory.html#joblib.Memory).
+
 ## Usage
 
 ``` python
