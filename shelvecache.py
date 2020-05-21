@@ -11,7 +11,7 @@ def dump_args(args: tuple, kwargs: dict) -> str:
 
 def shelvecache(shelvename="cache"):
     """
-    Decorator to wrap a function with a memoizing callable (like functools.lru_cache). 
+    Decorator to wrap a function or corroutine with a memoizing callable (like functools.lru_cache but in disk). 
     Save the function argument and result in a shelve.
 
     Parameters
@@ -22,8 +22,20 @@ def shelvecache(shelvename="cache"):
 
     def real_decorator(func_or_cor):
         if iscoroutinefunction(func_or_cor):
-            # cor = func_or_cor
-            raise NotImplementedError("decorator not implement for corroutine.")
+            cor = func_or_cor
+            
+            @wraps(cor)
+            async def wrapper(*args, **kwargs):
+                index = dump_args(args, kwargs)
+                
+                with shelve.open(shelvename) as db:
+                    if index in db:
+                        return db[index]
+
+                    res = await cor(*args, **kwargs)
+                    db[index] = res
+                return res
+
         else:
             func = func_or_cor
 
